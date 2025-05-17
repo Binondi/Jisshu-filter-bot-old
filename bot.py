@@ -1,3 +1,4 @@
+
 import sys
 import glob
 import importlib
@@ -32,7 +33,7 @@ from datetime import date, datetime
 import pytz
 from aiohttp import web
 from plugins import web_server
-import pyrogram.utils
+
 import asyncio
 from pyrogram import idle
 from Jisshu.bot import JisshuBot
@@ -44,11 +45,10 @@ files = glob.glob(ppath)
 JisshuBot.start()
 loop = asyncio.get_event_loop()
 
-pyrogram.utils.MIN_CHANNEL_ID = -1009147483647
 
 async def Jisshu_start():
     print('\n')
-    print('Initalizing Jisshu Filter Bot')
+    print('Initalizing The Movie Provider Bot')
     bot_info = await JisshuBot.get_me()
     JisshuBot.username = bot_info.username
     await initialize_clients()
@@ -62,7 +62,7 @@ async def Jisshu_start():
             load = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(load)
             sys.modules["plugins." + plugin_name] = load
-            print("Jisshu Filter Bot Imported => " + plugin_name)
+            print("The Movie Provider Imported => " + plugin_name)
     if ON_HEROKU:
         asyncio.create_task(ping_server())
     b_users, b_chats = await db.get_banned()
@@ -73,7 +73,6 @@ async def Jisshu_start():
     temp.ME = me.id
     temp.U_NAME = me.username
     temp.B_NAME = me.first_name
-    temp.B_LINK = me.mention
     JisshuBot.username = '@' + me.username
     logging.info(f"{me.first_name} with for Pyrogram v{__version__} (Layer {layer}) started on {me.username}.")
     logging.info(script.LOGO)
@@ -81,16 +80,12 @@ async def Jisshu_start():
     today = date.today()
     now = datetime.now(tz)
     time = now.strftime("%H:%M:%S %p")
-    await JisshuBot.send_message(chat_id=LOG_CHANNEL, text=script.RESTART_TXT.format(me.mention, today, time))
-    await JisshuBot.send_message(chat_id=SUPPORT_GROUP, text=f"<b>{me.mention} ʀᴇsᴛᴀʀᴛᴇᴅ 🤖</b>")
+    await JisshuBot.send_message(chat_id=LOG_CHANNEL, text=script.RESTART_TXT.format(today, time))
     app = web.AppRunner(await web_server())
     await app.setup()
     bind_address = "0.0.0.0"
     await web.TCPSite(app, bind_address, PORT).start()
     await idle()
-    for admin in ADMINS:
-        await JisshuBot.send_message(chat_id=admin, text=f"<b>{me.mention} ʙᴏᴛ ʀᴇsᴛᴀʀᴛᴇᴅ ✅</b>")
-
 
 
 if __name__ == '__main__':
